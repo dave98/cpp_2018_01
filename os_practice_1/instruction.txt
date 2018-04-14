@@ -1,0 +1,35 @@
+1: El makefile funciona de los archivos mas externos a los mas internos,
+empezamos definiendo la funcion mas externa, en este caso la aplicacion
+, seguidamente ejecutaremos en orden las dependencias que esta aplicacion
+tenga hastallegar a los  ficheros mas internos en este caso los '.cpp'
+(previamente van los '.o')
+
+2: -c Usado para crear un archivo en lenguaje maquina '.o' extension.
+
+4: La parte clean se ejecuta con "make clean", esta instrucciona hara todo lo que se instruye en el segmento clean
+
+
+//Brief tutorial to make a makefile with sense::::: Review the os_practice_1_pre_working to see the structure
+
+# Makefile for Writing Make Files Example
+
+# *****************************************************
+# Variables to control Makefile operation
+
+CXX = g++
+CXXFLAGS = -Wall -g
+
+# ****************************************************
+# Targets needed to bring the executable up to date
+
+main: main.o Point.o Rectangle.o
+	$(CXX) $(CXXFLAGS) -o main main.o Point.o Rectangle.o
+
+# The main.o target can be written more simply
+
+main.o: main.cpp Point.h Rectangle.h
+	$(CXX) $(CXXFLAGS) -c main.cpp
+
+Point.o: Point.h
+
+Rectangle.o: Rectangle.h Point.h

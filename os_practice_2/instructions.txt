@@ -1,0 +1,272 @@
+foo.h
+
+#ifndef foo_h__
+#define foo_h__
+ 
+extern void foo(void);
+ 
+#endif  // foo_h__
+
+
+
+foo.c
+#include <stdio.h>
+ 
+ 
+void foo(void)
+{
+    puts("Hello, I'm a shared library");
+}
+
+
+
+main.c
+#include <stdio.h>
+#include "foo.h"
+ 
+int main(void)
+{
+    puts("This is a shared library test...");
+    foo();
+    return 0;
+}
+
+
+Step 1: Compiling with Position Independent Code
+$ gcc -c -Wall -Werror -fpic foo.c
+
+Step 2: Creating a shared library from an object file
+gcc -shared -o libfoo.so foo.o
+
+Step 3: Linking with a shared library
+$ gcc -Wall -o test main.c -lfoo
+/usr/bin/ld: cannot find -lfoo
+collect2: ld returned 1 exit status
+
+
+Telling GCC where to find the shared library
+	$ gcc -L/home/username/foo -Wall -o test main.c -lfoo
+
+
+Step 4: Making the library available at runtime
+$ ./test
+./test: error while loading shared libraries: libfoo.so: cannot open shared object file: No such file or directory
+
+
+Using LD_LIBRARY_PATH
+$ ->>>> echo $LD_LIBRARY_PATH
+
+
+$ LD_LIBRARY_PATH=/home/username/foo:$LD_LIBRARY_PATH
+$ ./test
+./test: error while loading shared libraries: libfoo.so: cannot open shared object file: No such file or directory
+
+
+- >>>> LD_LIBRARY_PATH=/cygdrive/d/d_carpet/code/cpp/os_practice_2_v2/bin/shared:$LD_LIBRARY_PATH
+- >>>> export LD_LIBRARY_PATH=/cygdrive/d/d_carpet/code/cpp/os_practice_2_v2/bin/shared:$LD_LIBRARY_PATH
+
+
+$ ->>>> export LD_LIBRARY_PATH=/home/username/foo:$LD_LIBRARY_PATH
+$ ./test
+This is a shared library test...
+Hello, I'm a shared library
+
+
+Using ldconfig to modify ld.so
+$ cp /home/username/foo/libfoo.so /usr/lib
+$ chmod 0755 /usr/lib/libfoo.so
+
+$ ldconfig
+$ ldconfig -p | grep foo
+libfoo.so (libc6) => /usr/lib/libfoo.so
+
+$ unset LD_LIBRARY_PATH
+$ gcc -Wall -o test main.c -lfoo
+
+$ ldd test | grep foo
+libfoo.so => /usr/lib/libfoo.so (0x00a42000)
+
+$ ./test
+This is a shared library test...
+Hello, I'm a shared library
+
+-----------------------------------------------------------------
+
+add.c
+#include <stdio.h>
+
+int gSummand;
+
+
+void setSummand(int summand) {
+  gSummand = summand;
+}
+
+int add(int summand) {
+  return gSummand + summand;
+}
+
+void __attribute__ ((constructor)) initLibrary(void) {
+ //
+ // Function that is called when the library is loaded
+ //
+    printf("Library is initialized\n"); 
+    gSummand = 0;
+}
+void __attribute__ ((destructor)) cleanUpLibrary(void) {
+ //
+ // Function that is called when the library is »closed«.
+ //
+    printf("Library is exited\n"); 
+}
+
+add.h
+void setSummand(int summand);
+int  add(int summand);
+
+
+answer.c
+#include "add.h"
+
+int answer() {
+
+  setSummand(20);
+  return add(22);  // Will return 42 (=20+22)
+
+}
+
+
+answer.h
+int answer();
+
+
+main.c
+#include <stdio.h>
+#include "tq84/add.h"
+#include "tq84/answer.h"
+
+int main(int argc, char* argv[]) {
+
+  setSummand(5);
+
+  printf("5 + 7 = %d\n", add(7));
+	
+  printf("And the answer is: %d\n", answer());
+
+  return 0;
+	
+
+
+
+Create the object files
+->>>> gcc -c       src/main.c        -o bin/main.o
+
+#
+# Create the object files for the static library (without -fPIC)
+#
+->>>> gcc -c       src/tq84/add.c    -o bin/static/add.o
+gcc -c       src/tq84/answer.c -o bin/static/answer.o
+
+#
+# object files for shared libraries need to be compiled as position independent
+# code (-fPIC) because they are mapped to any position in the address space.
+#
+->>>> gcc -c -fPIC src/tq84/add.c    -o bin/shared/add.o
+gcc -c -fPIC src/tq84/answer.c -o bin/shared/answer.o
+
+
+Create static library
+->>>> ar rcs bin/static/libtq84.a bin/static/add.o bin/static/answer.o
+
+
+Link statically
+# 
+#
+->>>> gcc   bin/main.o  -Lbin/static -ltq84 -o bin/statically-linked
+
+Create the shared library
+# gcc -shared -L bin -l tq84-static -o bin/libtq84-shared.so
+->>>  gcc -shared bin/shared/add.o bin/shared/answer.o -o bin/shared/libtq84.so
+
+#
+#  In order to create_ a shared library, the position independent code
+#  must be used.
+#
+#  Not using the -PIC.o object files
+#      gcc -shared bin/static/add.o bin/static/answer.o -o bin/shared/libtq84.so
+#  produces this error:
+#     /usr/bin/ld: bin/tq84.o: relocation R_X86_64_PC32 against symbol `gSummand' can not be used when making a shared object; recompile with -fPIC
+#
+
+
+Link dynamically with the shared library
+# Note the order:
+#   -ltq84-shared needs to be placed AFTER main.c
+
+gcc  bin/main.o -Lbin/shared -ltq84 -o bin/use-shared-library
+
+
+
+
+
+
+
+
+
+
+
+Using LD_DEBUG
+#The LD_DEBUG environment variable might be helpful for some debugging tasks related to shared libraries.
+#
+#  Use LD_DEBUG
+#    set it to libs to display library search paths
+#
+LD_DEBUG=libs bin/use-shared-library
+
+#
+#  Setting LD_DEBUG to files to display progress for input files
+#
+LD_DEBUG=files bin/use-shared-library
+
+#
+#  Setting LD_DEBUG to reloc to display relocation processing
+#
+LD_DEBUG=reloc bin/use-shared-library
+
+LD_DEBUG=symbols bin/use-shared-library
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+#  Similar to objdump but more detailed:
+#
+readelf --relocs bin/shared/add.o
+readelf --relocs bin/static/add.o
+#
+#  TODO
+#
+#  List symbols in object files
+#
+nm bin/static/add.o
+nm bin/shared/libtq84Soname.so
+nm bin/statically-linked
+nm bin/dynamic-library-loader
+# Difference between -fPIC and without -fPIC
+objdump --disassemble bin/shared/add.o | sed -n '/<add>/,/^$/p'
+objdump --disassemble bin/static/add.o | sed -n '/<add>/,/^$/p'
+
+
+
+

@@ -1,0 +1,11 @@
+C:\Users\TOSHIBA\AppData\Local\Temp\cc7SsgF7.o:main.cpp:(.text+0x64): undefined reference to `Point::Point(int, int)'
+C:\Users\TOSHIBA\AppData\Local\Temp\cc7SsgF7.o:main.cpp:(.text+0x80): undefined reference to `Point::move(int, int)'
+C:\Users\TOSHIBA\AppData\Local\Temp\cc7SsgF7.o:main.cpp:(.text+0x8d): undefined reference to `Point::get_y() const'
+C:\Users\TOSHIBA\AppData\Local\Temp\cc7SsgF7.o:main.cpp:(.text+0x99): undefined reference to `Point::get_x() const'
+C:\Users\TOSHIBA\AppData\Local\Temp\cc7SsgF7.o:main.cpp:(.text+0x17c): undefined reference to `Point::Point(int, int)'
+C:\Users\TOSHIBA\AppData\Local\Temp\cc7SsgF7.o:main.cpp:(.text+0x1a2): undefined reference to `Rectangle::Rectangle(Point, Point)'
+C:\Users\TOSHIBA\AppData\Local\Temp\cc7SsgF7.o:main.cpp:(.text+0x1be): undefined reference to `circle<int>::circle(int, int)'
+C:\Users\TOSHIBA\AppData\Local\Temp\cc7SsgF7.o:main.cpp:(.text+0x1cb): undefined reference to `Rectangle::area() const'
+C:\Users\TOSHIBA\AppData\Local\Temp\cc7SsgF7.o:main.cpp:(.text+0x252): undefined reference to `circle<int>::~circle()'
+C:\Users\TOSHIBA\AppData\Local\Temp\cc7SsgF7.o:main.cpp:(.text+0x262): undefined reference to `circle<int>::~circle()'
+collect2.exe: error: ld returned 1 exit status
