@@ -22,52 +22,40 @@ bool compare_2(int, int);
 int main(){
   int soldier_number;
   vector<int> soldiers_height;
-  vector<int>::iterator max_element_;
-  vector<int>::iterator min_element_;
 
-  cin>>soldier_number;
-  for(int i = 0; i < soldier_number; i++){
-    int k;
-    cin>>k;
-    soldiers_height.push_back(k);
+cin>>soldier_number;
+for(int i = 0; i < soldier_number; i++){
+  int k;
+  cin>>k;
+  soldiers_height.push_back(k);
+}
+
+int max_s = soldiers_height[0];
+int min_s = soldiers_height[0];
+int max_c = 0;
+int min_c = soldiers_height.size();
+
+
+  //recorremos a todos los soldados.
+for(unsigned int i = 0; i < soldiers_height.size(); i++){
+  if(soldiers_height[i] > max_s){
+    max_s = soldiers_height[i];
+    max_c = i;
   }
-
-  int max_s = soldiers_height[0];
-  int min_s = soldiers_height[soldiers_height.size()-1];
-  int max_c = 0;
-  int min_c = 0;
-
-
-
-  for(unsigned int i = 1; i < soldiers_height.size(); i++){
-    if(soldiers_height[i] > max_s){
-      max_s = soldiers_height[i];
-      max_c = i;
-    }
+  if(soldiers_height[i] <= min_s){
+    min_s = soldiers_height[i];
+    min_c = soldiers_height.size() - i - 1;
   }
+}
 
-  for(unsigned int i = soldiers_height.size()-2; i > 0; i--){
-    //cout<<"saas"<<soldiers_height[i]<<endl;
-    if(soldiers_height[i] < min_s){
-      min_s = soldiers_height[i];
-      min_c = soldiers_height.size() - i;
-    }
-  }
+soldier_number = min_c + max_c;
 
-  cout<<"Min_c: "<<min_c<<" :: Max_s:"<<max_c<<endl;
-  soldier_number = min_c + max_c;
+if(soldier_number < (int)soldiers_height.size()){
+  cout<<soldier_number<<endl;
+}
+else{
+  cout<<--soldier_number<<endl;;
+}
 
-  if(soldier_number >= (int)soldiers_height.size()){
-    soldier_number -= 2;
-    cout<<soldier_number<<endl;
-  }
-  else{
-    cout<<soldier_number<<endl;
-  }
-
-
-  //max_element_ = max_element(soldiers_height.begin(), soldiers_height.end());
-  //min_element_ = min_element(soldiers_height.begin(), soldiers_height.end());
-
-  return 0;
+return 0;
 }
