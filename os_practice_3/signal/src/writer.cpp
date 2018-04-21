@@ -35,7 +35,7 @@ void singhandler(int signum){
   cout<<"Signal received: "<<signum<<endl;
   random_number = rand()%9 + 1;
   char tempo = random_number + '0';
-  cout<<tempo<<endl;
+  cout<<"Generated number: "<<tempo<<endl;
 
 
   fd = open(myfifo, O_WRONLY);

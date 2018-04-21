@@ -29,9 +29,9 @@ int main(){
 
   while(true){
     for(s = shm; *s != NULL; s++){
-      cout<<*s<<" , ";  
+      cout<<*s<<" , ";
     }
-    cout<<endl;
+    cout<<endl<<endl;
     sleep(2);
   }
 

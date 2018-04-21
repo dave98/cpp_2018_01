@@ -1,3 +1,4 @@
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,17 +10,15 @@
 
 #define SERVER_QUEUE_NAME   "/sp-example-server"
 #define QUEUE_PERMISSIONS 0660
-#define MAX_MESSAGES 10
+#define MAX_MESSAGES 20
 #define MAX_MSG_SIZE 256
 #define MSG_BUFFER_SIZE MAX_MSG_SIZE + 10
 
-int main (int argc, char **argv)
-{
+using namespace std;
+
+int main (){
     char client_queue_name [64];
     mqd_t qd_server, qd_client;   // queue descriptors
-
-
-    // create the client queue for receiving messages from server
     sprintf (client_queue_name, "/sp-example-client-%d", getpid ());
 
     struct mq_attr attr;
@@ -40,45 +39,29 @@ int main (int argc, char **argv)
     }
 
     char in_buffer [MSG_BUFFER_SIZE];
+    char temp_buf [20];
 
-    // printf ("Ask for a token (Press <ENTER>): ");
-    printf("Recived data by queue \n");
-
-    char temp_buf [10];
-
-    //while (fgets (temp_buf, 2, stdin)) {
     while (true) {
-        // send message to server
 
         if (mq_send (qd_server, client_queue_name, strlen (client_queue_name), 0) == -1) {
             perror ("Client: Not able to send message to server");
             continue;
         }
-
-        // receive response from server
-
         if (mq_receive (qd_client, in_buffer, MSG_BUFFER_SIZE, NULL) == -1) {
             perror ("Client: mq_receive");
             exit (1);
         }
-        // display token received from server
-        //printf ("Client: Token received from server: %s\n\n", in_buffer);
-        printf("In queue: %s \n", in_buffer);
-        sleep(3);
-        //printf ("Ask for a token (Press ): ");
+        cout<<in_buffer<<endl;
+        sleep(1);
     }
-
 
     if (mq_close (qd_client) == -1) {
         perror ("Client: mq_close");
         exit (1);
     }
-
     if (mq_unlink (client_queue_name) == -1) {
         perror ("Client: mq_unlink");
         exit (1);
     }
-    printf ("Client: bye\n");
-
     exit (0);
 }

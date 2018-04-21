@@ -86,20 +86,23 @@ int main()
       fd = open(myfifo, O_RDONLY);
       read(fd, &data, MAX_BUF);
       incoming_value = data - '0';
-      cout<<incoming_value;
+      cout<<"Received number: "<<incoming_value<<" -> ";
 
-      analyze_data(incoming_value);
+      //analyze_data(incoming_value);
+
       if(odds(incoming_value)){//Añadimos el char que identifica el numero
+        cout<<"Par -> Shared Memeory"<<endl;
         *s++ = data;
       }
       else{//Using queues
+        cout<<"Impar -> Queue"<<endl;
         if (mq_receive (qd_server, in_buffer, MSG_BUFFER_SIZE, NULL) == -1) {
             perror ("Server: mq_receive");
             exit (1);
         }
 
-        printf ("Server: message received.\n");
-        printf ("Client: %s\n",in_buffer);
+        //printf ("Server: message received.\n");
+        //printf ("Client: %s\n",in_buffer);
 
         if ((qd_client = mq_open (in_buffer, O_WRONLY)) == 1) {
             perror ("Server: Not able to open client queue");
@@ -114,7 +117,7 @@ int main()
             perror ("Server: Not able to send message to client");
             continue;
         }
-        printf ("Server: response sent to client.\n");
+        //printf ("Server: response sent to client.\n");
         token_number++;
       }
 

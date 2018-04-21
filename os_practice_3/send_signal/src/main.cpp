@@ -15,8 +15,9 @@ int main(){
   cout<<"Waiting for signal ID process: "<<endl;
   cin>>target_id;
 
+  int i = 0;
   while(true){
-    cout<<"Sending a signal: "<<signal_number<<endl;
+    cout<<"Signal N: "<<++i<<""<<signal_number<<endl;
     kill(target_id, signal_number);
     sleep(1);
   }
