@@ -18,7 +18,7 @@ int main(){
   int i = 0;
   while(true){
     cout<<"Signal N: "<<++i<<""<<signal_number<<endl;
-    kill(target_id, signal_number);
+    kill(target_id, signal_number);//Envia la señal, funcion kill
     sleep(1);
   }
   return 0;

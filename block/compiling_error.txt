@@ -1,4 +1,0 @@
-D:\d_carpet\code\cpp\block\main.cpp: In function 'int main()':
-D:\d_carpet\code\cpp\block\main.cpp:12:8: error: cannot convert 'char (*)[10]' to 'char*' in assignment
-   b = &a;
-        ^
