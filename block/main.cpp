@@ -28,23 +28,19 @@ vector<int> operator +(const vector<int> &a, const vector<int> &b){
 }
 
 int main(){
-
-  vector<int> a(4, 100);
-  vector<int> b(2, 22);
-
-  a = b;
+  vector<int> a;
+  a.push_back(1);
+  a.push_back(2);
+  a.push_back(3);
+  a.push_back(4);
+  a.push_back(5);
   print_v(a);
-  cout<<"  "<<a.size()<<endl;
+  a.erase(a.begin()+0);
+  print_v(a);
+  a.erase(a.begin()+1-1);
+  print_v(a);
+  cout<<*a.end()<<endl;
 
-
-/*
-  if(a == b){
-    cout<<"True"<<endl;
-  }
-  else{
-    cout<<"False"<<endl;
-  }
-*/
 
 }
 

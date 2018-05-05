@@ -8,25 +8,45 @@
 using namespace std;
 
 int main(){
+  c_r_tree<int, 2, 4> primer_arbol;
 
-  vector<int> a(3, 20);// 5 datos con 20
-
-  c_nodo<int, 4, 6> nodo_1;
-  c_r_tree<int, 4, 6> tree_1;
-
-  c_point<int, 4> b(a);
-  //c_point<int, 4> c(b);
-  //c_point<int, 4> d;
-  //d = b + c;
+  c_point<int, 2> p_1;
+  c_point<int, 2> p_2;
+  c_point<int, 2> p_3;
+  c_point<int, 2> p_4;
 
 
-  cout<<"b: "<<b<<endl;
-  b = b/2;
-  cout<<"b: "<<b<<endl;
+  cin>>p_1;
+  cin>>p_2;
+  cin>>p_3;
+  cin>>p_4;
 
-  //cout<<"c: "<<c<<endl;
-  //cout<<"d: "<<d<<endl;
-  //cout<<"b+c: "<<b+c<<endl;
+  cout<<"Todos los puntos listos: "<<p_1<<" "<<p_2<<" "<<p_3<<" "<<p_4<<endl;
+  primer_arbol.insert(p_1);
+  primer_arbol.insert(p_2);
+  primer_arbol.insert(p_3);
+  primer_arbol.insert(p_4);
+
+
+
+/*
+  c_point<int, 4> a_point;
+  cin>>a_point;
+
+  c_point<int, 4> b_point;
+  cin>>b_point;
+
+  c_nodo<int, 4, 5> a(a_point);
+  a.nodo_general_view();
+  a.add_point(b_point);
+  a.nodo_general_view();
+  a.add_point(b_point);
+  a.add_point(b_point);
+  a.add_point(b_point);
+  a.add_point(b_point);
+
+  a.nodo_general_view();
+*/
 
   return 0;
 }

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <cmath>
 
 using namespace std;
 
@@ -17,6 +18,7 @@ public:
   c_point(vector<T>);
   c_point(const c_point<T, O> &x);
   ~c_point();
+
 
   //Overload section: Interaction between points
   //+ sobrecarga afuera, dont´t know what happen when it's inside class.
@@ -40,7 +42,14 @@ c_point<S, P> operator / (const c_point<S,P>&, const float&);
 template<class S, int P>
 float distancia(const c_point<S, P>&, const c_point<S,P>&);
 
+template<class S, int P>
+float area_n_dimension(const c_point<S, P>&, const c_point<S, P>&);
 
+template<class S, int P>
+float area_n_dimension_no(const c_point<S, P>&, const c_point<S, P>&);
+
+template<class S, int P>
+c_point<S,P> middle_point(const c_point<S, P>&, const c_point<S, P>&);
 
 //No podemos perder la dimension de nuestros puntos
 template <class T, int O>//Si le pasamos un dato de mayor dimension al interno dicho dato se verá recortado a esta nueva dimension
@@ -67,10 +76,10 @@ c_point<T, O>::c_point(){
   this->p_data = vector<T>(O, (T)0);
 }
 
-template <class T, int O>
+template<class T, int O>
 c_point<T, O>::~c_point(){
-
 }
+
 
 //La sobrecarga de igualdad en vectores retorna true sin contienen los mismos datos y el mismo tamaño
 template <class T, int O>
@@ -143,12 +152,42 @@ c_point<S, P> operator / (const c_point<S,P> &a, const float &b){
 template<class S, int P>
 float distancia(const c_point<S, P> &a, const c_point<S,P> &b){
   float distance = 0.0;
-  for(unsigned int i = 0; i < a.p_data.size(); i++){
+  for(unsigned int i = 0; i < P; i++){
     distance = distance + pow(a[i] - b[i], 2);
   }
   distance = sqrt(distance);
   return distance;
 }
+
+//Ahora b tiene que ser el mayor
+template<class S, int P>
+float area_n_dimension(const c_point<S, P> &a, const c_point<S,P> &b){
+  float area = 1.0;
+  for(unsigned int i = 0; i < P; i++){
+    //area = area + (a.p_data[i] * b.p_data[i]);
+    area = area * (b.p_data[i] - a.p_data[i]);
+  }
+  return abs(area);
+}
+
+//Ahora b tiene que ser el mayor
+template<class S, int P>
+float area_n_dimension_no(const c_point<S, P> &a, const c_point<S,P> &b){
+  float area = 1.0;
+  for(unsigned int i = 0; i < P; i++){
+    //area = area + (a.p_data[i] * b.p_data[i]);
+    area = area * (b.p_data[i] - a.p_data[i]);
+  }
+  return area;
+}
+
+template<class S, int P>
+c_point<S,P> middle_point(const c_point<S, P> &a, const c_point<S, P> &b){
+  c_point<S, P> answer = a + b;
+  answer = answer/2;
+  return answer;
+}
+
 
 
 
