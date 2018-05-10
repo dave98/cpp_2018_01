@@ -19,6 +19,7 @@ public:
 
   ///FUNCIONES_PRIMARIAS
   void insert(c_point<T,D>);
+  void search(c_point<T,D>);
 
   ///FUNCIONES SECUNDARIOS pero importantes, no borrar
   int choose_leaf(c_nodo<T,D,C>**, c_point<T, D>); //Nuestro navegante y el punto con el que haremos las comparaciones
@@ -30,6 +31,8 @@ public:
     void pick_seeds_region(c_nodo<T,D,C>**, int*, int*);
     bool pick_next(c_nodo<T,D,C>*, c_nodo<T,D,C>*, c_point<T,D>);
     bool pick_next_region(c_nodo<T,D,C>*, c_nodo<T,D,C>*, c_nodo<T,D,C>*);
+
+    void tree_overview();
 
 };
 
@@ -70,18 +73,56 @@ void c_r_tree<T,D,C>::insert(c_point<T,D> incoming_point){
   if(*navegante == NULL){//En el caso de la cabeza por ejemplo
     cout<<"Creando cabeza con: "<<incoming_point<<endl;
     *navegante = new c_nodo<T, D, C>(incoming_point); //Creamos el nuevo nodo con un punto ya listo
+    this->tree_records_number++;
   }
   else{//Significa que estamos en un hoja
       //añadiremos una condicion para evitar punto identicos mas adelante.
       (*navegante)->add_point(incoming_point);
+      this->tree_records_number++;
       cout<<"Poniendo punto: "<<incoming_point<<endl;
       if(!(*navegante)->right_number_of_menbers()){
-        //cout<<"Se ha producido un SPLIT con "<<incoming_point<<endl;
+        cout<<"Se ha producido un SPLIT con "<<incoming_point<<endl;
         //Aca debe haber una funcion de split
         //Esta funcion de split afecta de inversa al arbol por lo que debe ser apropiado
         //del arbol
         this->split_node(navegante, backtrack);
       }
+  }
+  cout<<"Existen "<<this->tree_records_number<<" en el arbol."<<endl;
+
+}
+
+
+template<class T, int D, int C>
+void c_r_tree<T,D,C>::search(c_point<T,D> incoming_point){
+  c_nodo<T,D,C>** navegante = &this->head;
+  bool travel_condition = true;
+
+  while(travel_condition){
+    if(*navegante == NULL or (*navegante)->is_leaf == true){
+      travel_condition = false;
+      //Recorremos el arbol hasta llegar a una hoja o si llegamos a un punto vacío.
+    }
+    else{//AQUI SOLO SE LLEGA SI NO ES UNA HOJA O NO ES EL INICIO, en otras palabras solo cuando la cabeza se llena
+        // y se debe buscar la region a la que le corresponde.
+      //cout<<"Descendiendo a la hoja: "<<this->choose_leaf( navegante, incoming_point)<<endl;
+      navegante = &((*navegante)->region[ this->choose_leaf( navegante, incoming_point) ]);//De momento bajaremos siempre por la region cero
+                                              //Debe ser una funcion que retorne la region(int) a la cual descenderemos.
+    }
+    if(*navegante == NULL){
+      cout<<"Arbol vacio, nada que buscar"<<endl;
+      return;
+    }
+    else{
+      for(unsigned int i = 0; i < (*navegante)->inner_points.size(); i++){
+        if(incoming_point == (*navegante)->inner_points[i]){
+          cout<<"Se ha encontrado el punto"<<endl;
+          return;
+        }
+      }
+      cout<<"No se ha encontrado el punto"<<endl;
+      return;
+    }
   }
 }
 
@@ -157,6 +198,8 @@ void c_r_tree<T,D,C>::split_node(c_nodo<T,D,C>** navegante_interno, vector< c_no
     this->pick_seeds(navegante_interno, &index_for_seed_1, &index_for_seed_2);//Obtenemos las semillas con las que vamos a trabajar.
     c_nodo<T,D,C>* new_region_1 = new c_nodo<T,D,C>((*navegante_interno)->inner_points[index_for_seed_1]);//Creamos las nuevas regiones con los puntos
     c_nodo<T,D,C>* new_region_2 = new c_nodo<T,D,C>((*navegante_interno)->inner_points[index_for_seed_2]);//Creamos las nuevas regiones con los puntos
+    cout<<"Nuevas regiones 1 con rangos l_d: "<<new_region_1->l_d<<" u_r: "<<new_region_1->u_r<<endl;
+    cout<<"Nuevas regiones 2 con rangos l_d: "<<new_region_2->l_d<<" u_r: "<<new_region_2->u_r<<endl;
 
     //El indexado de la semilla 1 esta siempre por delante del indexado de la semilla 2
     (*navegante_interno)->inner_points.erase((*navegante_interno)->inner_points.begin() + index_for_seed_1);
@@ -171,6 +214,9 @@ void c_r_tree<T,D,C>::split_node(c_nodo<T,D,C>** navegante_interno, vector< c_no
         new_region_1->add_point((*navegante_interno)->inner_points[i]);
       }
     }
+
+    cout<<"Region 1 finalizados con rangos l_d: "<<new_region_1->l_d<<" u_r: "<<new_region_1->u_r<<endl;
+    cout<<"Region 2 finalizados con rangos l_d: "<<new_region_2->l_d<<" u_r: "<<new_region_2->u_r<<endl;
 
     if(backtrack.empty()){//Si el backtrack esta vacio es que tratamos con el padre
       (*navegante_interno)->is_leaf = false;
@@ -193,20 +239,20 @@ void c_r_tree<T,D,C>::split_node(c_nodo<T,D,C>** navegante_interno, vector< c_no
     else{
       //Si aun existen datos en el backtrack, eliminamos la rama en donde se produjo el split y añadimos sus ramas consecuentes
       // a la lista de regiones de su padre.
-      for(unsigned int i = 0; i < *backtrack.end()->region.size(); i++){
-        if(*backtrack.end()->region[i] == *navegante_interno){
-          *backtrack.end()->region.erase(*backtrack.end()->region.begin()+i);
-          i = *backtrack.end()->region.size();
+      for(unsigned int i = 0; i < (backtrack.back())->region.size(); i++){
+        if((backtrack.back())->region[i] == *navegante_interno){
+          (backtrack.back())->region.erase((backtrack.back())->region.begin()+i);
+          i = (backtrack.back())->region.size();
         }
       }
 
-      *backtrack.end()->add_region(new_region_1);
-      *backtrack.end()->add_region(new_region_2);
+      (backtrack.back())->add_region(new_region_1);
+      (backtrack.back())->add_region(new_region_2);
       //*backtrack.end()->region.push_back(new_region_1);
       //*backtrack.end()->region.push_back(new_region_2);
 
-      if(! *backtrack.end()->right_number_of_regions()){
-        this->split_node(&(backtrack.end()), backtrack);
+      if(! (backtrack.back())->right_number_of_regions()){
+        this->split_node(&(backtrack.back()), backtrack);
       }
       else{
         return;
@@ -249,7 +295,7 @@ void c_r_tree<T,D,C>::split_node(c_nodo<T,D,C>** navegante_interno, vector< c_no
           (*navegante_interno)->region.clear(); //Limpiamos las regiones anteriores
           (*navegante_interno)->add_region(new_region_1);//Añadimos las regiones que acabamos de crear.
           (*navegante_interno)->add_region(new_region_2);//Añadimos las regiones que acabamos de crear.
-          if(!(*navegante_interno)->verified_region_ranges()){
+          if(!((*navegante_interno)->right_number_of_regions())){
             split_node(navegante_interno, backtrack);
           }
           else{
@@ -257,18 +303,18 @@ void c_r_tree<T,D,C>::split_node(c_nodo<T,D,C>** navegante_interno, vector< c_no
           }
     }
     else{
-      for(unsigned int i = 0; i < *backtrack.end()->region.size(); i++){
-        if(*backtrack.end()->region[i] == *navegante_interno){
-          *backtrack.end()->region.erase(*backtrack.end()->region.begin()+i);
-          i = *backtrack.end()->region.size();
+      for(unsigned int i = 0; i < (backtrack.back())->region.size(); i++){
+        if((backtrack.back())->region[i] == *navegante_interno){
+          (backtrack.back())->region.erase((backtrack.back())->region.begin()+i);
+          i = (backtrack.back())->region.size();
         }
       }
 
-      *backtrack.end()->add_region(new_region_1);
-      *backtrack.end()->add_region(new_region_2);
+      (backtrack.back())->add_region(new_region_1);
+      (backtrack.back())->add_region(new_region_2);
 
-      if(! *backtrack.end()->right_number_of_regions()){
-        this->split_node(&(backtrack.end()), backtrack);
+      if(! (backtrack.back())->right_number_of_regions()){
+        this->split_node(&(backtrack.back()), backtrack);
       }
       else{
         return;
@@ -283,8 +329,8 @@ void c_r_tree<T,D,C>::split_node(c_nodo<T,D,C>** navegante_interno, vector< c_no
 //los datos que actuarán como semillas, asi cuando proceda a añadir a los demás los evitaré.
 template<class T, int D, int C>
 void c_r_tree<T,D,C>::pick_seeds(c_nodo<T,D,C>** navegante_interno, int* seed_1, int* seed_2){//Only works for nodes with numbers.
-  seed_1 = 0;
-  seed_2 = 1;
+  *seed_1 = 0;
+  *seed_2 = 1;
   float area_base = area_n_dimension((*navegante_interno)->l_d, (*navegante_interno)->u_r);//Sacamos el area para restar con las demás
   //float changed_area = area_n_dimension((*navegante_interno)->inner_points[seed_1], (*navegante_interno)->inner_points[seed_2]);
   //float minimun_area = area_base - changed_area; // mayor a cero
@@ -293,12 +339,14 @@ void c_r_tree<T,D,C>::pick_seeds(c_nodo<T,D,C>** navegante_interno, int* seed_1,
   //Todos estos puntos están dentro de la region
   //Estamos buscando el area que desperdicie mas espacio
   //Comportamiento cuadratico por que recorrera dos veces la columnas de los puntos
-  for(unsigned int i = 0; i < (*navegante_interno)->inner_points.size()-1; i++){//Recorremos los puntos de dicho nodo
-    for(unsigned int j = i+1; j < (*navegante_interno)->inner_points.size(); j++){
+  //for(unsigned int i = 0; i < (*navegante_interno)->inner_points.size()-1; i++){//Recorremos los puntos de dicho nodo
+    //for(unsigned int j = i+1; j < (*navegante_interno)->inner_points.size(); j++){
+  for(unsigned int i = 0; i < (*navegante_interno)->inner_points.size(); i++){//Recorremos los puntos de dicho nodo
+    for(unsigned int j = 0; j < (*navegante_interno)->inner_points.size(); j++){
       changed_area = area_n_dimension((*navegante_interno)->inner_points[i], (*navegante_interno)->inner_points[j]);
       if((area_base - changed_area) >= minimun_area){
-        seed_1 = i;
-        seed_2 = j;
+        *seed_1 = i;
+        *seed_2 = j;
         minimun_area = area_base - changed_area;
       }
     }
@@ -307,8 +355,8 @@ void c_r_tree<T,D,C>::pick_seeds(c_nodo<T,D,C>** navegante_interno, int* seed_1,
 
 template<class T, int D, int C>
 void c_r_tree<T,D,C>::pick_seeds_region(c_nodo<T,D,C>** navegante_interno, int* seed_1, int* seed_2){//Only works for nodes with numbers.
-  seed_1 = 0;
-  seed_2 = 1;
+  *seed_1 = 0;
+  *seed_2 = 1;
   float area_base = area_n_dimension((*navegante_interno)->l_d, (*navegante_interno)->u_r);//Sacamos el area para restar con las demás
   //float changed_area = area_n_dimension((*navegante_interno)->inner_points[seed_1], (*navegante_interno)->inner_points[seed_2]);
   //float minimun_area = area_base - changed_area; // mayor a cero
@@ -324,8 +372,8 @@ void c_r_tree<T,D,C>::pick_seeds_region(c_nodo<T,D,C>** navegante_interno, int* 
       //ahora los puntos medios decada region para marcarlos como referencia.
       changed_area = area_n_dimension((*navegante_interno)->region[i]->l_d, (*navegante_interno)->region[j]->u_r);
       if((area_base - changed_area) >= minimun_area){
-        seed_1 = i;
-        seed_2 = j;
+        *seed_1 = i;
+        *seed_2 = j;
         minimun_area = area_base - changed_area;
       }
     }
@@ -360,4 +408,19 @@ bool c_r_tree<T,D,C>::pick_next_region(c_nodo<T,D,C>* new_region_1, c_nodo<T,D,C
     return true;//1 para la region dos
   }
 }
+
+
+template <class T, int D, int C>
+void c_r_tree<T,D,C>::tree_overview(){
+  vector< c_nodo<T,D,C>* > stack;
+  stack.push_back(this->head);
+  while(!stack.empty()){
+      for(unsigned int i = 0; i < stack[0]->region.size(); i++){
+        stack.push_back(stack[0]->region[i]);
+      }
+      stack.erase(stack.begin());
+  }
+
+}
+
 #endif

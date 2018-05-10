@@ -33,6 +33,7 @@ public:
   bool right_number_of_regions();//Verifica si aún mantiene un número correcto de regiones.
   ///FUNCIONES SECUNDARIAS.
   void print_nodo();
+  void nodo_overview();
   void nodo_general_view();
   c_point<T,D> get_middle_point();
 
@@ -136,6 +137,16 @@ void c_nodo<T,D,C>::print_nodo(){
     cout<<inner_points[i]<<" ";
   }
   cout<<endl;
+}
+
+template<class T, int D, int C>
+void c_nodo<T,D,C>::nodo_overview(){
+  if(!this->is_leaf){
+    cout<<"Rama de regiones"<<endl;
+  }
+  else{
+    cout<<"Hoja de Datos"<<endl;
+  }
 }
 
 template<class T, int D, int C>

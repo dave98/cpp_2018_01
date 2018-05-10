@@ -27,21 +27,30 @@ vector<int> operator +(const vector<int> &a, const vector<int> &b){
   }
 }
 
+class pair_{
+public:
+  int x;
+  int y;
+  pair_(int _x, int _y){
+    this->x = _x;
+    this->y = _y;
+  }
+  ~pair_(){};
+};
+
 int main(){
-  vector<int> a;
-  a.push_back(1);
-  a.push_back(2);
-  a.push_back(3);
-  a.push_back(4);
-  a.push_back(5);
-  print_v(a);
-  a.erase(a.begin()+0);
-  print_v(a);
-  a.erase(a.begin()+1-1);
-  print_v(a);
-  cout<<*a.end()<<endl;
+  pair_ p1(5,7);
+  pair_ p2(6,8);
+  pair_ p3(7,9);
+  pair_ p4(8,10);
 
+  vector< pair_ > a;
+  a.push_back(p1);
+  a.push_back(p2);
+  a.push_back(p3);
+  a.push_back(p4);
 
+  cout<<(a.back()).x<<endl;
 }
 
 
