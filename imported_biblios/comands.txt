@@ -7,3 +7,4 @@
 
 Las bibliotecas aqui sirven para opengl, redireccionar los flags en la compilacion c++, ver tutorial de stackoverflow
 
+-std=c++11 -Wall -lglu32 -lopengl32 ../imported_biblios/glut32.lib
