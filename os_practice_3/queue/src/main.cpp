@@ -64,7 +64,7 @@ int main (int argc, char **argv)
         // display token received from server
         //printf ("Client: Token received from server: %s\n\n", in_buffer);
         printf("In queue: %s \n", in_buffer);
-        sleep(3);
+        //sleep(3);
         //printf ("Ask for a token (Press ): ");
     }
 

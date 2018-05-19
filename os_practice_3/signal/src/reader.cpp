@@ -81,12 +81,13 @@ int main()
 
     /* open, read, and display the message from the FIFO */
 
+    int counter = 0;
 
     while(true){
       fd = open(myfifo, O_RDONLY);
       read(fd, &data, MAX_BUF);
       incoming_value = data - '0';
-      cout<<"Received number: "<<incoming_value<<" -> ";
+      cout<<"Received number "<<counter++<<" : "<<incoming_value<<" -> ";
 
       //analyze_data(incoming_value);
 
@@ -123,7 +124,7 @@ int main()
 
       *s = NULL;
       close(fd);
-      sleep(1);
+      //sleep(1);
     }
 
     return 0;
