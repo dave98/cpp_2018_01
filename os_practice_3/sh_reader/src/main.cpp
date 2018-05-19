@@ -33,23 +33,13 @@ int main(){
 
   cout<<"An intance of a shared memory has been added."<<endl;
 
-  /*while(true){
-    for(s = shm; *s != NULL; s++){
-      cout<<*s<<" , ";
-    }
-    cout<<endl<<endl;
-    //sleep(2);
-  }*/
-
   while(true){
     s = shm;
     if(*s != NULL){
       for(; *s != NULL; s++){
         cout<<*s<<" , ";
-        //*s = NULL;
       }
       cout<<endl;
-      //s = shm; *s = NULL;
     }
 
   }

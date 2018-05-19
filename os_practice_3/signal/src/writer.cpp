@@ -24,10 +24,6 @@ void fifo_function_v2(int);
 mutex stop_work;
 
 int main(){
-
-  //pid_t retrieval_id = getpid();
-  ///mkfifo(myfifo, 0666);
-
   signal(SIGUSR1, singhandler);
   cout<<"Id: "<<getpid()<<endl;
 
@@ -37,12 +33,8 @@ int main(){
       random_number = rand()%10 + 1;
       thread(fifo_function_v2, random_number).detach();
       cout<<"Reducing queue: "<<i++<<endl;
-      //fifo_function();
-      //thread(fifo_function).detach();
       temporal_number--;
     }
-    //cout<<".  "<<retrieval_id<<endl;
-    //i--;
     //sleep(1);
   }
 
@@ -53,16 +45,6 @@ int main(){
 void singhandler(int signum){
   stop_work.lock();
   temporal_number++;
-  //cout<<"TN: "<<temporal_number<<endl;
-  ///cout<<"Signal received: "<<signum<<endl;
-  ///random_number = rand()%5 + 1;
-  ///char tempo = random_number + '0';
-  ///cout<<"Generated number: "<<tempo<<endl;
-
-  ///fd = open(myfifo, O_WRONLY);
-  ///write(fd, &tempo, sizeof(char) );
-  ///close(fd);
-
   stop_work.unlock();
 }
 
