@@ -6,6 +6,13 @@
 #include "c_point.h"//Manejo de puntos para una dimension.
 using namespace std;
 
+template<class T, int D, int C>
+extern vector< c_point<T, D> > arriba_derecha;
+
+template<class T, int D, int C>
+extern vector< c_point<T, D> > abajo_izquierda;
+
+
 template<class T, int D, int C>//T data type, D data dimension, C puntos por nodos >= 4
 class c_nodo{
 public:
@@ -15,6 +22,7 @@ public:
   vector< c_nodo<T,D,C>* > region;//Empezamos con cero apuntadores.
   c_point<T, D> l_d; //left down, punto izquierdo inferior
   c_point<T, D> u_r; //right up punto derecho superior.
+  int node_id;
 
 
   c_nodo();//Contructor por defecto
@@ -46,6 +54,7 @@ c_nodo<T,D,C>::c_nodo(){
   this->l_d = temp;//En el constructor por defecto ambos empiezan con punto igual a cero.
   this->u_r = temp;//En el constructor por defecto ambos empiezan con punto igual a cero.
   this->is_leaf = true; //Por defecto empieza como hoja
+  this->node_id = 0;
 }
 
 template<class T, int D, int C>
@@ -54,6 +63,7 @@ c_nodo<T,D,C>::c_nodo(c_point<T,D> incoming_point){
   this->u_r = incoming_point;
   this->is_leaf = true;
   this->inner_points.push_back(incoming_point);//Starting this node with one point
+  this->node_id = 0;
 }
 
 
@@ -62,6 +72,7 @@ c_nodo<T, D, C>::c_nodo(c_point<T, D> _l_d, c_point<T, D> _u_r){
   this->l_d = _l_d; //Igualamos este limite a los parametro ingresantes.
   this->u_r = _u_r; //Igualamos este limite a los parametro ingresantes.
   this->is_leaf = true; //Siempre empezamos como hoja.
+  this->node_id = 0;
 }
 
 template<class T, int D, int C>
@@ -85,6 +96,10 @@ void c_nodo<T,D,C>::verified_both_ranges(c_point<T,D> incoming_point){
       u_r.p_data[i] = incoming_point.p_data[i];
     }
   }
+
+  //añadiendo la regiones al grafico.
+  arriba_derecha<T,D,C>.push_back(this->u_r);
+  abajo_izquierda<T,D,C>.push_back(this->l_d);
 }
 
 template<class T, int D, int C>

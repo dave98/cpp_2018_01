@@ -38,7 +38,11 @@ public:
   ~pair_(){};
 };
 
-int main(){
+void random_function(const int& a, const int& b){
+  cout<<a+b<<endl;
+}
+
+int main(){/*
   pair_ p1(5,7);
   pair_ p2(6,8);
   pair_ p3(7,9);
@@ -50,8 +54,18 @@ int main(){
   a.push_back(p3);
   a.push_back(p4);
 
-  cout<<(a.back()).x<<endl;
-}
+  cout<<(a.back()).x<<endl;*/
+  //a.clear();
+  //cout<<"Size: "<<sizeof(a)<<endl;
+  int a = 10;
+  int b = 100;
+  random_function(a , b);
 
+  return 0;
+}
+//Siendo a un puntero
+//*a indica el contenido del puntero
+//a indica la direccion a dondes se apuntadores
+//&a indica la direccion del mismo puntero a.
 
 //RESULTS: 372 mb for a million of ints an long ints, don't get it.
