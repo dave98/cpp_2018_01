@@ -52,6 +52,7 @@ public:
   c_nodo();//Contructor por defecto
   c_nodo(c_point<T, D>); //Un unico punto en este nodo, actua de ambos limites.
   c_nodo(c_point<T, D>, c_point<T, D>);//Constructor con parametros para setear nuevos limites instantaneos
+  c_nodo(c_nodo<T,D,C>*);//Constructor orientado a regiones, recibe un puntero y setea la nueva region y los datos automaticamente
   ~c_nodo();
 
 
@@ -141,9 +142,20 @@ c_nodo<T,D,C>::c_nodo(c_point<T,D> _l_d, c_point<T,D> _u_r){
   this->node_id = 0;
 }
 
+template <class T, int D, int C>
+c_nodo<T,D,C>::c_nodo(c_nodo<T,D,C>* incoming_region){
+  this->is_leaf = true;
+  this->inner_points = vector<c_point<T,D> >(0, c_point<T,D>());
+  this->region = vector< c_nodo<T,D,C>* > (0, NULL);
+  this->dad = NULL;
+  this->l_d = incoming_region->l_d;
+  this->u_r = incoming_region->u_r;
+  this->add_region(incoming_region,false);
+}
 
 template<class T, int D, int C>
 c_nodo<T,D,C>::~c_nodo(){
+  //cout<<"Destruyendo datos"<<endl;
   this->inner_points.clear();
   this->region.clear();
 }
@@ -249,15 +261,18 @@ template<class T, int D, int C>
 int c_nodo<T,D,C>::right_leaf(const c_point<T,D> incoming_point){
   int answer = 0;//Por defecto, y ya salvando errores, saltamos a la regon 0
   float recursive_area = 0;//Guarda el area [a procesar](importante) si a esa region se le añade un punto
-  cout<<"Flag"<<endl;
+  //cout<<"Se que hasta aca llegas 1"<<endl;
   float best_area = this->region[0]->nodo_get_affected_area(incoming_point) - this->region[0]->nodo_get_area();
+  //cout<<"Lista de opciones: "<<best_area<<" ";
   for(unsigned int i = 1; i < this->region.size(); i++){
     recursive_area = this->region[i]->nodo_get_affected_area(incoming_point) - this->region[i]->nodo_get_area();
+    //cout<<recursive_area<<" ";
     if(recursive_area <= best_area){
       best_area = recursive_area;
       answer = i;
     }
   }
+  //cout<<endl;
 
   //EXPANDIREMOS el area de cada region por donde pasemos.
   this->verified_both_ranges(incoming_point);
@@ -306,7 +321,16 @@ void c_nodo<T,D,C>::nodo_select_picks_region(int* a, int* b){//a for l_d and b f
       *b = i;
     }
   }
-  if(*a == *b){cout<<"Oye hay un error en nodo_select_picks_region ven a revisar."<<endl;}
+  if(*a == *b){
+    cout<<"Oye hay un error en nodo_select_picks_region ven a revisar."<<endl;
+    cout<<" Habian "<<this->region.size()<<" regiones. Listando: "<<endl;
+    for(unsigned int i = 0; i < this->region.size(); i++){
+      cout<<this->region[i]->l_d<<" - "<<this->region[i]->u_r<<" ";
+      if(i == *a){cout<<"Elegido";}
+      cout<<endl;
+    }
+  }
+
 }
 
 /////////////////////////FUNCIONES SECUNDARIAS///////////////////////////
@@ -366,8 +390,10 @@ float c_nodo<T,D,C>::nodo_get_area(){
 
 template <class T, int D, int C>
 float c_nodo<T,D,C>::nodo_get_affected_area(const c_point<T,D> incoming_point){//Area affected by a point
+  //cout<<"LLEGAS 2 CON EL PUNTO"<<incoming_point<<endl;
   c_point<T,D> _l_d = this->l_d;
   c_point<T,D> _u_r = this->u_r;
+  //cout<<"HERE: "<<this->l_d<<" -  "<<this->u_r<<endl;
   for(int i = 0; i < D; i++){
     if(_l_d.p_data[i] > incoming_point.p_data[i]){
       _l_d.p_data[i] = incoming_point.p_data[i];
@@ -376,6 +402,7 @@ float c_nodo<T,D,C>::nodo_get_affected_area(const c_point<T,D> incoming_point){/
       _u_r.p_data[i] = incoming_point.p_data[i];
     }
   }
+  //cout<<"LLEGAS 3"<<endl;
   return area_n_dimension(_l_d, _u_r);
 }
 

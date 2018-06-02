@@ -55,14 +55,14 @@ c_r_tree<T,D,C>::~c_r_tree(){}
 template<class T, int D, int C>
 void c_r_tree<T,D,C>::insert(c_point<T,D> incoming_point){
   bool travel_condition = true;
-  int _node_id = 0;
+  //int _node_id = 0;
   //Ya no necesitamos un backtrack por medio de listas
 
 
   c_nodo<T, D, C>** navegante = &head;
   while(travel_condition){
     if(*navegante == NULL or (*navegante)->is_leaf == true){
-      cout<<"CATEDRIAN_1"<<endl;
+      //cout<<"CATEDRIAN_1"<<endl;
       travel_condition = false;
       //(*navegante)->node_id = _node_id;
       //Recorremos el arbol hasta llegar a una hoja o si llegamos a un punto vacío.
@@ -71,33 +71,33 @@ void c_r_tree<T,D,C>::insert(c_point<T,D> incoming_point){
         // y se debe buscar la region a la que le corresponde.
       //navegante = &((*navegante)->region[ this->choose_leaf( navegante, incoming_point) ]);
       //Debe ser una funcion que retorne la region(int) a la cual descenderemos.
-      cout<<"CATEDRIAN_2"<<endl;
-      cout<<"Pasando por la region de limites: "<<(*navegante)->l_d<<"; "<<(*navegante)->u_r<<endl;
-      (*navegante)->node_id = _node_id;
-      _node_id++;
+      //cout<<"CATEDRIAN_2"<<endl;
+      //cout<<"Pasando por la region de limites: "<<(*navegante)->l_d<<"; "<<(*navegante)->u_r<<endl;
+      //(*navegante)->node_id = _node_id;
+      //_node_id++;
       navegante = &((*navegante)->region[ (*navegante)->right_leaf(incoming_point) ]);//REEMPLAZO AL choose_leaf, incrustado en el nodo
     }
   }
 
   if(*navegante == NULL){//En el caso de la cabeza por ejemplo
-    cout<<"Creando cabeza con: "<<incoming_point<<endl;
+    //cout<<"Creando cabeza con: "<<incoming_point<<endl;
     *navegante = new c_nodo<T, D, C>(incoming_point); //Creamos el nuevo nodo con un punto ya listo
     this->tree_records_number++;
-    //this->get_transformation();
   }
   else{//Significa que estamos en un hoja
       //añadiremos una condicion para evitar punto identicos mas adelante.
-      (*navegante)->add_point(incoming_point);
-      this->tree_records_number++;
-      cout<<"Poniendo punto: "<<incoming_point<<endl;
-      cout<<"Rango de la region actual"<<(*navegante)->l_d<<"; "<<(*navegante)->u_r<<endl;
-      if(!(*navegante)->right_number_of_menbers()){
-        cout<<"Se ha producido un SPLIT con "<<incoming_point<<endl;
-        //Aca debe haber una funcion de split
-        //Esta funcion de split afecta de inversa al arbol por lo que debe ser apropiado
-        //del arbol
-        this->split_nodo_v2(navegante);
-        //this->get_transformation();
+      if((*navegante)->add_point(incoming_point)){
+        this->tree_records_number++;
+        //cout<<"Poniendo punto: "<<incoming_point<<endl;
+        //cout<<"Rango de la region actual"<<(*navegante)->l_d<<"; "<<(*navegante)->u_r<<endl;
+        if(!(*navegante)->right_number_of_menbers()){
+          //cout<<"Se ha producido un SPLIT con "<<incoming_point<<endl;
+          //Aca debe haber una funcion de split
+          //Esta funcion de split afecta de inversa al arbol por lo que debe ser apropiado
+          //del arbol
+          this->split_nodo_v2(navegante);
+          //this->get_transformation();
+        }
       }
   }
   cout<<"Existen "<<this->tree_records_number<<" en el arbol."<<endl;
@@ -203,7 +203,7 @@ void c_r_tree<T,D,C>::split_nodo_v2(c_nodo<T,D,C>** navegante_interno){
 //rect.clear();
 //profundidad.clear();
   if((*navegante_interno)->is_leaf){
-    cout<<"Segmentando hoja"<<endl;
+    //cout<<"Segmentando hoja"<<endl;
     int index_for_seed_1 = 0;
     int index_for_seed_2 = 0;
     (*navegante_interno)->nodo_select_picks(&index_for_seed_1, &index_for_seed_2);
@@ -230,10 +230,10 @@ void c_r_tree<T,D,C>::split_nodo_v2(c_nodo<T,D,C>** navegante_interno){
       }
     }
 
-    cout<<"Split: "<<endl;
-    cout<<"Region deshecha: "<<(*navegante_interno)->l_d<<" ; "<<(*navegante_interno)->u_r<<endl;
-    cout<<"Nuevas regiones: 1-> "<<new_region_1->l_d<<" ; "<<new_region_1->u_r<<endl;
-    cout<<"Nuevas regiones: 2-> "<<new_region_2->l_d<<" ; "<<new_region_2->u_r<<endl;
+    //cout<<"Split: "<<endl;
+    //cout<<"Region deshecha: "<<(*navegante_interno)->l_d<<" ; "<<(*navegante_interno)->u_r<<endl;
+    //cout<<"Nuevas regiones: 1-> "<<new_region_1->l_d<<" ; "<<new_region_1->u_r<<endl;
+    //cout<<"Nuevas regiones: 2-> "<<new_region_2->l_d<<" ; "<<new_region_2->u_r<<endl;
 
     //La cabeza hace split una vez en toda su vida cuando se trata de puntos
     if(*navegante_interno == this->head){
@@ -254,18 +254,19 @@ void c_r_tree<T,D,C>::split_nodo_v2(c_nodo<T,D,C>** navegante_interno){
 
       for(unsigned int i = 0; i < padre->region.size(); i++){
         if(padre->region[i] == (*navegante_interno)){
+          delete padre->region[i];
           padre->region.erase(padre->region.begin() + i); //Nos deshacemos de la region que dividimos. Ahora navegante_interno es el unico que apunta a algo inexistente
         }
       }
 
-      delete (*navegante_interno);//Borramos el nodo que se dividio. Ahora navegante_interno esta en NULL;
+      //delete (*navegante_interno);//Borramos el nodo que se dividio. Ahora navegante_interno esta en NULL;
       padre->add_region(new_region_1);
       padre->add_region(new_region_2);
 
       //if(! padre->right_number_of_regions){
         //this->split_nodo_v2(&padre);
       //}
-      cout<<"Segmentacion de hoja finalizadas"<<endl;
+      //cout<<"Segmentacion de hoja finalizadas"<<endl;
 
       bool adjust_tree = true;
       while(adjust_tree and padre){
@@ -285,12 +286,14 @@ void c_r_tree<T,D,C>::split_nodo_v2(c_nodo<T,D,C>** navegante_interno){
   }
   else{
     //Entramos acá si existe un desborde en el numero de regiones almacenadas en una region.
-    cout<<"Segmentando region"<<endl;
+    //cout<<"Segmentando region"<<endl;
     int index_for_seed_1 = 0;
     int index_for_seed_2 = 0;
     (*navegante_interno)->nodo_select_picks_region(&index_for_seed_1, &index_for_seed_2);
-    c_nodo<T,D,C>* new_region_1 = new c_nodo<T,D,C>((*navegante_interno)->region[index_for_seed_1]->l_d, (*navegante_interno)->region[index_for_seed_1]->u_r);//ISSUES: Mejorar se van a examinar rangos estupidos
-    c_nodo<T,D,C>* new_region_2 = new c_nodo<T,D,C>((*navegante_interno)->region[index_for_seed_2]->l_d, (*navegante_interno)->region[index_for_seed_2]->u_r);
+    //c_nodo<T,D,C>* new_region_1 = new c_nodo<T,D,C>((*navegante_interno)->region[index_for_seed_1]->l_d, (*navegante_interno)->region[index_for_seed_1]->u_r);//ISSUES: Mejorar se van a examinar rangos estupidos
+    //c_nodo<T,D,C>* new_region_2 = new c_nodo<T,D,C>((*navegante_interno)->region[index_for_seed_2]->l_d, (*navegante_interno)->region[index_for_seed_2]->u_r);
+    c_nodo<T,D,C>* new_region_1 = new c_nodo<T,D,C>((*navegante_interno)->region[index_for_seed_1]);
+    c_nodo<T,D,C>* new_region_2 = new c_nodo<T,D,C>((*navegante_interno)->region[index_for_seed_2]);
     //new_region_1->is_leaf = false;
     //new_region_2->is_leaf = false;
     //Nos deshacemos de las regiones que actuaron como semillas para la segmentacion
@@ -312,17 +315,17 @@ void c_r_tree<T,D,C>::split_nodo_v2(c_nodo<T,D,C>** navegante_interno){
       }
     }
 
-    cout<<"Split de regiones: "<<endl;
-    cout<<"Region deshecha: "<<(*navegante_interno)->l_d<<" ; "<<(*navegante_interno)->u_r<<endl;
-    cout<<"Nuevas regiones: 1-> "<<new_region_1->l_d<<" ; "<<new_region_1->u_r<<endl;
-    cout<<"Nuevas regiones: 2-> "<<new_region_2->l_d<<" ; "<<new_region_2->u_r<<endl;
+    //cout<<"Split de regiones: "<<endl;
+    //cout<<"Region deshecha: "<<(*navegante_interno)->l_d<<" ; "<<(*navegante_interno)->u_r<<endl;
+    //cout<<"Nuevas regiones: 1-> "<<new_region_1->l_d<<" ; "<<new_region_1->u_r<<endl;
+    //cout<<"Nuevas regiones: 2-> "<<new_region_2->l_d<<" ; "<<new_region_2->u_r<<endl;
 
     if(*navegante_interno == this->head){
       (*navegante_interno)->region.clear();//Somos una cabeza que nos vamos a dividir
       new_region_1->dad = *navegante_interno;//Este nodo de paso ahora apunta a su origen.
       new_region_2->dad = *navegante_interno;
-      (*navegante_interno)->add_region(new_region_1, false);
-      (*navegante_interno)->add_region(new_region_2, false);
+      (*navegante_interno)->add_region(new_region_1, true);
+      (*navegante_interno)->add_region(new_region_2, true);
     }
     else{
       c_nodo<T,D,C>* padre = (*navegante_interno)->dad;
@@ -330,17 +333,18 @@ void c_r_tree<T,D,C>::split_nodo_v2(c_nodo<T,D,C>** navegante_interno){
       new_region_2->dad = padre;
       for(unsigned int i = 0; i < padre->region.size(); i++){
         if(padre->region[i] == (*navegante_interno)){
+          delete padre->region[i];
           padre->region.erase(padre->region.begin()+ i);
         }
       }
-      delete (*navegante_interno);//Borramos el nodo que se dividio. Ahora navegante_interno esta en NULL;
+      //delete (*navegante_interno);//Borramos el nodo que se dividio. Ahora navegante_interno esta en NULL;
       padre->add_region(new_region_1);
       padre->add_region(new_region_2);
 
       //if(! padre->right_number_of_regions){
         //this->split_nodo_v2(&padre);
       //}
-      cout<<"Segmentacion de region finalizada"<<endl;
+      //cout<<"Segmentacion de region finalizada"<<endl;
       bool adjust_tree = true;
       while(adjust_tree and padre){
         if(! padre->right_number_of_regions()){
@@ -639,22 +643,27 @@ extern vector<int> profundidad;*/
 template <class T, int D, int C>
 void c_r_tree<T,D,C>::get_transformation(){
   if(this->head){
+    this->head->node_id = 0;
+    //int low_level = 0;
+    //int temp_level = 0;
     rect.clear();
     profundidad.clear();
-    cout<<"Transformada pasao 1"<<endl;
-    int i_profundidad = 0;
+
     vector<c_nodo<T,D,C>* > stack;
     stack.push_back(this->head);
     rect.push_back(*this->head);
-    profundidad.push_back(this->head->node_id);
-    i_profundidad++;
-    while(!stack.empty()){
+    //profundidad.push_back(0);
+
+    while(!stack.empty()){  
+      profundidad.push_back(stack[0]->node_id);
       if(stack[0]->is_leaf == false){
         for(unsigned int i = 0; i < stack[0]->region.size(); i++){
+          stack[0]->region[i]->node_id = stack[0]->node_id + 1;
           stack.push_back(stack[0]->region[i]);
           rect.push_back(*stack[0]->region[i]);
-          profundidad.push_back(stack[0]->region[i]->node_id);
+          //profundidad.push_back(stack[0]->region[i]->node_id);
         }
+
       }
       stack.erase(stack.begin());
     }

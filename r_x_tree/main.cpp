@@ -11,27 +11,51 @@
 
 using namespace std;
 
+void read_document(c_r_tree<float, 2, 3>*);
 
 int main(){
-  vector <c_point<int, 2> > record;
-  c_r_tree<int, 2, 3> a_a;
-  ofstream myfile;
-  myfile.open("ruta.txt");
+  //vector <c_point<int, 2> > record;
+  c_r_tree<float, 2, 3> a_a;
+  //ofstream myfile;
+  //myfile.open("ruta.txt");
 
-  while(true){
+  /*while(true){
     c_point<int, 2> tempo;
     cout<<"Inserte datos"<<endl;
     cin>>tempo;
     a_a.insert(tempo);
-    myfile<<tempo.p_data[0]<<" ; "<<tempo.p_data[1]<<endl<<flush ;
+    //myfile<<tempo.p_data[0]<<" ; "<<tempo.p_data[1]<<endl<<flush ;
     //record.push_back(tempo);
     //for(unsigned int i = 0; i < record.size(); i++){
       //cout<<record[i]<<" ";
     //}
     //cout<<endl;
   }
-  myfile.close();
+  //myfile.close();
+  */
+  read_document(&a_a);
+  cout<<"Lectura finalizada"<<endl;
   return 0;
+}
+
+void read_document(c_r_tree<float, 2, 3>* tree){
+  int counter = 0;
+  float x, y;
+  char txt_name[20];
+  cout<<"Nombre del archivo"<<endl;
+  cin>>txt_name;
+
+  fstream reader(txt_name, ios::in);
+
+  while(reader>>x and reader>>y){
+    //cout<<"Insertando"<<x<<" - "<<y<<endl;
+    vector<float> tiran(1, x); tiran.push_back(y);
+    c_point<float, 2> tempo(tiran);
+    tree->insert(tempo);
+    counter++;
+  }
+  cout<<"Existen "<<tree->tree_records_number<<" de datos"<<endl;
+  cout<<"Datos leidos: "<<counter<<endl;
 }
 
 

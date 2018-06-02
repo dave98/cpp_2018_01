@@ -29,6 +29,8 @@ void translate_points(float& ,float& );
 void graficar_rectangulos();
 void graficar_rectangulos_v2();
 void graficar_puntos();
+void set_new_color(vector<float>&);
+void imprimir_paleta(vector<float>);
 //en el caso que la ventana cambie de tama�o
 GLvoid window_redraw(GLsizei, GLsizei);
 GLvoid window_key(unsigned char, int, int);
@@ -59,7 +61,8 @@ int main(int argc, char** argv){
 
 void init_GL(void) {
 	//Color del fondo de la escena
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f); //(R, G, B, transparencia) en este caso un fondo negro
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f); //(R, G, B, transparencia) en este caso un fondo negro
+	//glClearColor(255, 255, 255, 0.0f); //(R, G, B, transparencia) en este caso un fondo negro
 	//modo projeccion
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -89,23 +92,59 @@ void graficar_rectangulos(){
   glEnd();
 }
 
+void set_new_color(vector<float>& incoming){
+  int grade = rand()%3;
+  incoming[grade] = (rand()%10 + 1) / 10;
+}
+
+void imprimir_paleta(vector<float> incoming){
+  for(unsigned int i = 0; i < incoming.size(); i++){
+    cout<<incoming[i]<<" ";
+  }
+  cout<<endl;
+}
+
 void graficar_rectangulos_v2(){
-  cout<<"Pintando..."<<endl;
+  //cout<<"Pintando..."<<endl;
   int color = 0;
-  float paleta = 0.1;
-  arbol.get_transformation();
-  cout<<"Transformada obtenida"<<endl;
+  //float paleta = 0.1;
+  vector<float> paleta(3, 0.0f);
+  paleta[0] = 0.0f;
+  paleta[1] = 0.4f;
+  paleta[2] = 0.0f;
+  //set_new_color(paleta);
+  //imprimir_paleta(paleta);
+  //arbol.get_transformation();
+  //cout<<"Transformada obtenida"<<endl;
   for(unsigned int i = 0; i < rect.size(); i++){
     if(color != profundidad[i]){
       color = profundidad[i];
-      paleta += 0.2;
+      paleta[(color%3)] = ( (paleta[color%3] * 10) + ((color%10) + 1) )/10;
+      //set_new_color(paleta);
+      //paleta += 0.1;
     }
+    /*
+
+
     glBegin(GL_POLYGON);
-    glColor3d(paleta, 0, 0.3);
+    glColor3d(paleta[0], paleta[1], paleta[2]);
     glVertex2f(rect[i].l_d.p_data[0], rect[i].l_d.p_data[1]);
     glVertex2f(rect[i].l_d.p_data[0], rect[i].u_r.p_data[1]);
     glVertex2f(rect[i].u_r.p_data[0], rect[i].u_r.p_data[1]);
     glVertex2f(rect[i].u_r.p_data[0], rect[i].l_d.p_data[1]);
+    glEnd();
+    */
+    glBegin(GL_LINES);
+    glColor3d(paleta[0], paleta[1], paleta[2]);
+    //glColor3d(0.0, 0.0, 0.0);
+    glVertex2f(rect[i].l_d.p_data[0], rect[i].l_d.p_data[1]);
+    glVertex2f(rect[i].l_d.p_data[0], rect[i].u_r.p_data[1]);
+    glVertex2f(rect[i].l_d.p_data[0], rect[i].u_r.p_data[1]);
+    glVertex2f(rect[i].u_r.p_data[0], rect[i].u_r.p_data[1]);
+    glVertex2f(rect[i].u_r.p_data[0], rect[i].u_r.p_data[1]);
+    glVertex2f(rect[i].u_r.p_data[0], rect[i].l_d.p_data[1]);
+    glVertex2f(rect[i].u_r.p_data[0], rect[i].l_d.p_data[1]);
+    glVertex2f(rect[i].l_d.p_data[0], rect[i].l_d.p_data[1]);
     glEnd();
   }
 
@@ -115,6 +154,7 @@ void graficar_rectangulos_v2(){
 void graficar_puntos(){
   glPointSize(2);
   glBegin(GL_POINTS);
+  //glColor3d(0,0,0);
   glColor3d(255,255,255);
   for(unsigned int i = 0; i < data_point.size(); i++){
     glVertex2f(data_point[i].p_data[0], data_point[i].p_data[1]);
@@ -132,8 +172,8 @@ void glPaint(void) {
 	//dibujar quadTree (qt->draw())
 	//dibuja el gizmo
 	//displayGizmo();//It's my own function
-  graficar_puntos();
   graficar_rectangulos_v2();
+  graficar_puntos();
   //graficar_rectangulos();
   //graficar_cuadrantes( c_point(0,0) , c_point(1000, 1000));
 	//add_late_points();
@@ -144,17 +184,17 @@ void glPaint(void) {
 }
 
 void OnMouseMotion(int x, int y){
-  vector<float> datos;
-  float x_2 = (float)x;
-  float y_2 = (float)y;
+  //vector<float> datos;
+  //float x_2 = (float)x;
+  //float y_2 = (float)y;
 
-  translate_points(x_2, y_2);
+  //translate_points(x_2, y_2);
 
-  datos.push_back((float)x_2);
-  datos.push_back((float)y_2);
+  //datos.push_back((float)x_2);
+  //datos.push_back((float)y_2);
 
-  c_point<float, 2> tempo(datos);
-  data_point.push_back(tempo);
+  //c_point<float, 2> tempo(datos);
+  //data_point.push_back(tempo);
 
   //float x_2 = (float)x;
 	//float y_2 = (float)y;
@@ -178,6 +218,7 @@ void OnMouseClick(int button, int state, int x, int y){
   c_point<float, 2> tempo(datos);
   data_point.push_back(tempo);
   arbol.insert(tempo);
+  arbol.get_transformation();
 	/*for(unsigned int i = 0; i < data_point.size(); i++){
 		cout<<data_point[i]<<" ";
 	}*/
