@@ -8,6 +8,7 @@
 #include "c_point.h" //Alllows me to interact with points of n dimensions
 #include "c_nodo.h"
 #include <ctime>
+#include <fstream>
 
 //CREATED BY jose david mamani vilca. jose.mamani.vilca@ucsp.edu.pe
 #define KEY_ESC 27
@@ -17,6 +18,7 @@ c_r_tree<float, 2, 3> arbol;
 vector< c_point<float, 2> > data_point;
 vector< c_nodo<float, 2, 3> > rect;//ESTOS DOS VAN DE LA MANO
 vector< int > profundidad;
+vector<float > data_late;
 
 //inicializacion de OpenGL
 void init_GL(void);
@@ -31,11 +33,21 @@ void graficar_rectangulos_v2();
 void graficar_puntos();
 void set_new_color(vector<float>&);
 void imprimir_paleta(vector<float>);
+void read_document();
 //en el caso que la ventana cambie de tama�o
 GLvoid window_redraw(GLsizei, GLsizei);
 GLvoid window_key(unsigned char, int, int);
 
 int main(int argc, char** argv){
+
+  char answer;
+	cout<<"Document loader: (Y/N)"<<endl;
+	cin>>answer;
+
+	if(answer == 'Y' or answer == 'y'){
+		read_document();
+	}
+
   //Inicializacion de la GLUT
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -58,6 +70,50 @@ int main(int argc, char** argv){
 
   return 0;
 }
+
+void read_document(){
+	float point_x, point_y;//Local store for coming data.
+	char txt_name[20];//Nombre con el archivo de puntos
+	//vector<float> x_list;
+	//vector<float> y_list;
+
+	cout<<"Nombre del Archivo: "<<endl;
+	cin>>txt_name;
+
+	fstream reader(txt_name, ios::in);
+
+	//reader >> point_x; max_x = point_x; min_x = point_x;// main configurations
+	//reader >> point_y; max_y = point_y; min_y = point_y;//
+	//coming_counter++;
+	while(reader >> point_x and reader >> point_y){
+    data_late.push_back(point_x);
+    data_late.push_back(point_y);
+	}
+
+  cout<<"The document reading process has ended. Drawing a window, next to it, points will be inserted."<<endl;
+	cin>>txt_name;
+}
+
+
+void add_late_points(void){
+	if(!data_late.empty()){
+		for(unsigned int i = 0; i < data_late.size(); i+=2){
+			float _x = data_late[i]; float _y = data_late[i+1];
+      cout<<_x<<"  "<<_y<<endl;
+      //translate_points(_x, _y);
+      vector<float> v_tempo;
+      v_tempo.push_back(_x);
+      v_tempo.push_back(_y);
+      //translate_points(_x, _y);
+      c_point<float, 2> p_tempo(v_tempo);
+			data_point.push_back(p_tempo);
+			arbol.insert(p_tempo);
+		}
+		data_late.clear();
+    arbol.get_transformation();
+	}
+}
+
 
 void init_GL(void) {
 	//Color del fondo de la escena
@@ -173,6 +229,7 @@ void glPaint(void) {
 	//dibuja el gizmo
 	//displayGizmo();//It's my own function
   graficar_rectangulos_v2();
+  add_late_points();
   graficar_puntos();
   //graficar_rectangulos();
   //graficar_cuadrantes( c_point(0,0) , c_point(1000, 1000));
@@ -212,7 +269,7 @@ void OnMouseClick(int button, int state, int x, int y){
   float y_2 = (float)y;
 
   translate_points(x_2, y_2);
-
+  cout<<x_2<<"  "<<y_2<<endl;
   datos.push_back((float)x_2);
   datos.push_back((float)y_2);
   c_point<float, 2> tempo(datos);
